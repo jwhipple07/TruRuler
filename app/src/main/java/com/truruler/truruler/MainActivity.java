@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity
 
     private GestureDetector mGestureDetector;
     private float inchPixelMark, distancePixelMark;
-    ImageView ourView;
+    public ImageView ourView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
