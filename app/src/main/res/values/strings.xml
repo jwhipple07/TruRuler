@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">TruRuler</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!--PREFERENCES -->
+    <string name="pref_title_measure_mode">Change measurement preference</string>
+    <string-array name="pref_measure_type">
+        <item>Standard</item>
+        <item>Metric</item>
+    </string-array>
+    <string-array name="pref_measure_list_values">
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+</resources>
