@@ -20,8 +20,24 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="Preferences"></activity>
-        <activity android:name=".ResizeActivity"></activity>
+            android:label="Preferences"/>
+        <activity android:name=".ResizeActivity"/>
+        <activity
+            android:name=".MeasurementsOverviewActivity"
+            android:label="Saved Measurements"
+            android:theme="@style/PopupTheme"/>
+
+        <activity
+            android:name=".MeasurementsDetailActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:theme="@style/AppActionBarTheme" >
+        </activity>
+
+        <provider
+            android:name="contentprovider.MeasurementsContentProvider"
+            android:authorities="contentprovider" >
+        </provider>
     </application>
+
 
 </manifest>

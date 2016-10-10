@@ -24,15 +24,6 @@
         android:id="@+id/draggable"
         android:text="DRAG ME"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Use the short side of a credit card."
-        android:id="@+id/textView2"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/draggable" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,5 +31,16 @@
         android:id="@+id/resetToDefault"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Use the short side of a credit card."
+        android:id="@+id/textView2"
+        android:layout_alignBaseline="@+id/draggable"
+        android:layout_alignBottom="@+id/draggable"
+        android:layout_alignParentEnd="true"
+        android:layout_width="250dp"
+        android:textAlignment="center" />
 
 </RelativeLayout>

@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -25,20 +26,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private GestureDetector mGestureDetector;
-    private float inchPixelMark, distancePixelMark;
-    public ImageView ourView;
-    
+    private android.support.design.widget.CoordinatorLayout layout;
+    private draggableMeasureView draggable;
+    private draggableMeasureView draggableVertical;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         // Bind the gestureDetector to GestureListener
@@ -47,7 +56,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        draw(R.id.imageviewTest);
+       // draw(R.id.imageviewTest);
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -62,31 +71,44 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        getSupportActionBar().hide();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        RelativeLayout main = (RelativeLayout) findViewById(R.id.mainLayout);
-        main.setOnTouchListener(new View.OnTouchListener() {
 
-            public boolean onTouch(View v, MotionEvent event) {
-                boolean eventConsumed=mGestureDetector.onTouchEvent(event);
-                if (eventConsumed)
-                {
-                    GestureListener.actionBar = getSupportActionBar();
-                    return true;
+        com.truruler.truruler.DrawView main = (com.truruler.truruler.DrawView) findViewById(R.id.DrawView);
+        main.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                try {
+                    if (getSupportActionBar().isShowing()) {
+                        getSupportActionBar().hide();
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    } else {
+                        getSupportActionBar().show();
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    }
+                } catch (NullPointerException ne){
+                    Toast.makeText(getBaseContext(), "There is no action bar", Toast.LENGTH_SHORT).show();
                 }
-                return false;
+                return true;
             }
         });
 
+        layout = (android.support.design.widget.CoordinatorLayout)findViewById(R.id.appBarMain);
+        draggable = (draggableMeasureView) findViewById(R.id.DragView);
+        draggable.setOnTouchListener(new MyTouchListener());
+        draggableVertical = (draggableMeasureView) findViewById(R.id.DragViewVertical);
+        draggableVertical.verticalFlag = true;
+        draggableVertical.setOnTouchListener(new MyTouchListener2());
     }
     @Override
     protected void onResume(){
         super.onResume();
-        draw(R.id.imageviewTest);
 
     }
     @Override
@@ -103,6 +125,8 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+        ((TextView)findViewById(R.id.todaysdate)).setText(currentDateTimeString);
         return true;
     }
 
@@ -129,221 +153,107 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
+        if (id == R.id.nav_gallery) {
+            Toast.makeText(getBaseContext(),"This is empty for now", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.nav_calibrate) {
             Intent intent = new Intent(this, ResizeActivity.class);
             startActivity(intent);
-
+        } else if (id == R.id.nav_add_new_measurement) {
+            Intent intent = new Intent(this, MeasurementsOverviewActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_slideshow) {
+            Toast.makeText(getBaseContext(),"This is empty for now", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_share) {
-
+            Toast.makeText(getBaseContext(),"This is empty for now", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_send) {
-
+            Toast.makeText(getBaseContext(),"This is empty for now", Toast.LENGTH_SHORT).show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+    private final class MyTouchListener implements View.OnTouchListener {
+        int orgX, orgY;
+        int offsetX, offsetY;
+        int orgYView;
+        int orgWidth, orgHeight;
 
-    // This is our draw() method
-    public void draw(int ID) {
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    orgX = (int) event.getRawX();
+                    orgY = (int) event.getRawY();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int type = Integer.parseInt(sharedPreferences.getString("example_list", "0"));
+                    orgWidth = v.getMeasuredWidth();
+                    orgHeight = v.getMeasuredHeight();
 
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
+                    orgYView = (int)v.getY();
 
-        float devicePixelsHeight = getResources().getDisplayMetrics().heightPixels;
-        float deviceActualDpi = getResources().getDisplayMetrics().ydpi;
-        float deviceActualInchHeight = devicePixelsHeight / deviceActualDpi;
-
-        float devicePixelsWidth = getResources().getDisplayMetrics().widthPixels;
-        float deviceActualXDpi = getResources().getDisplayMetrics().xdpi;
-        float deviceActualInchWidth = devicePixelsWidth / deviceActualXDpi;
-
-        double x = Math.pow(dm.widthPixels / dm.xdpi, 2);
-        double y = Math.pow(dm.heightPixels / dm.ydpi, 2);
-        double screenInches = Math.sqrt(x + y);
-        Log.i("", "");
-
-        deviceActualDpi = sharedPreferences.getFloat("ydpi", dm.ydpi);
-        screenInches = (double) Math.round(screenInches * 10) / 10;
-
-
-        // Declare an object of type Bitmap
-        Bitmap blankBitmap;
-        // Make it 600 x 600 pixels in size and an appropriate format
-        blankBitmap = Bitmap.createBitmap(dm, dm.widthPixels, dm.heightPixels + dm.heightPixels, Bitmap.Config.ARGB_8888);
-        // Declare an object of type canvas
-        Canvas canvas;
-        // Initialize it by making its surface our previously created blank bitmap
-        canvas = new Canvas(blankBitmap);
-
-        // Initialize our previously declared member object of type ImageView
-        ourView = new ImageView(this);
-        ourView = (ImageView) findViewById(ID);
-        // Put our blank bitmap on ourView
-        ourView.setImageBitmap(blankBitmap);
-
-        // We now have a surface ready to draw on
-        // But we need something to draw with
-
-        // Declare an object of type Paint
-        Paint paint;
-        // Initialize it ready for painting our canvas
-        paint = new Paint();
-        paint.setStrokeWidth(5);
-        // Make the canvas white
-        canvas.drawColor(Color.LTGRAY);
-
-        // Make the brush blue
-        paint.setColor(Color.BLACK);
-        distancePixelMark = devicePixelsWidth / 5F;
-        switch (type) {
-
-            case 0: //metric
-                //draw cm?
-                float deviceActualCMHeight = deviceActualInchHeight / 2.54F;
-                float dotsPerCMHeight = deviceActualDpi / 2.54F; // dots per cm
-                for (int i = 0; i < 20; i++) {
-                    float[] points = new float[40];
-                    for (int j = 0; j < 40; j += 4) {
-                        points[j] = 0; //start x
-                        points[j + 1] = (i * dotsPerCMHeight) + ((j / 4) * (dotsPerCMHeight / 10)); //start y
-                        switch (j / 4) { //end x
-                            case 0:
-                                points[j + 2] = distancePixelMark / 1.33F;
-                                break;
-                            case 5:
-                                points[j + 2] = distancePixelMark / 2F;
-                                break;
-                            default:
-                                points[j + 2] = distancePixelMark / 4F;
-                                break;
-                        }
-                        points[j + 3] = (i * dotsPerCMHeight) + ((j / 4) * (dotsPerCMHeight / 10)); //end y
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    offsetX = (int)event.getRawX() - orgX;
+                    offsetY = (int)event.getRawY() - orgY;
+                    android.support.design.widget.CoordinatorLayout.LayoutParams layoutParams = (android.support.design.widget.CoordinatorLayout.LayoutParams) v
+                            .getLayoutParams();
+                    Integer finalPlace = orgYView + offsetY;
+                    if(finalPlace < 0){
+                        finalPlace = 0;
+                    } else if(finalPlace > dm.heightPixels - 150){
+                        finalPlace = dm.heightPixels - 150;
                     }
-                    if (i != 0) {
-                        //add inch line numbers
-                        int textSize = 50;
-                        paint.setTextSize(textSize);
-                        paint.setColor(Color.BLUE);
-                        canvas.drawText(Integer.toString(i), points[2] + 10, points[3] + (textSize / 3), paint);
-                        paint.setColor(Color.BLACK);
-                    }
-                    canvas.drawLines(points, paint);
-                }
-                float dotsPerCMWidth = dm.xdpi / 2.54F; // dots per cm
-                for (int i = 0; i < 20; i++) {
-                    float[] points = new float[40];
-                    for (int j = 0; j < 40; j += 4) {
-                        points[j] = (i * dotsPerCMWidth) + ((j / 4) * (dotsPerCMWidth / 10)); //start x
-                        points[j + 1] = 0; //start y
-                        points[j + 2] = (i * dotsPerCMWidth) + ((j / 4) * (dotsPerCMWidth / 10)); //end x
-                        switch (j / 4) { //end y
-                            case 0:
-                                points[j + 3] = distancePixelMark / 1.33F;
-                                break;
-                            case 5:
-                                points[j + 3] = distancePixelMark / 2F;
-                                break;
-                            default:
-                                points[j + 3] = distancePixelMark / 4F;
-                                break;
-                        }
-                    }
-                    if (i != 0) {
-                        //add inch line numbers
-                        int textSize = 50;
-                        paint.setTextSize(textSize);
-                        paint.setColor(Color.BLUE);
-                        canvas.drawText(Integer.toString(i), points[2] - textSize / 3, points[3] + (textSize), paint);
-                        paint.setColor(Color.BLACK);
-                    }
-                    canvas.drawLines(points, paint);
-                }
-                break;
-            case 1: //standard
-                inchPixelMark = deviceActualDpi;
-                // We can change this around as well
-                for (int j = 0; j < 5; j++) {
-                    float[] points = new float[64];
-
-                    for (int i = 0; i < 64; i += 4) {
-
-
-                        points[i] = 0; //start x
-                        points[i + 1] = (j * deviceActualDpi) + ((i / 4) * (deviceActualDpi / 16)); //start y
-                        switch (i / 4) { //end x
-                            case 0:
-                                points[i + 2] = distancePixelMark;
-                                break;
-                            case 4:
-                            case 12:
-                                points[i + 2] = distancePixelMark / 2.6F;
-                                break;
-                            case 8:
-                                points[i + 2] = distancePixelMark / 1.6F;
-                                break;
-                            default:
-                                points[i + 2] = distancePixelMark / 8;
-                        }
-
-                        points[i + 3] = (j * deviceActualDpi) + ((i / 4) * (deviceActualDpi / 16)); //end y
-                    }
-                    if (j != 0) {
-                        //add inch line numbers
-                        int textSize = 50;
-                        paint.setTextSize(textSize);
-                        paint.setColor(Color.BLUE);
-                        canvas.drawText(Integer.toString(j), points[2] + 10, points[3] + (textSize / 3), paint);
-                        paint.setColor(Color.BLACK);
-                    }
-                    canvas.drawLines(points, paint);
-                }
-                //draw top inch ruler
-                for (int j = 0; j < 3; j++) {
-                    float[] points = new float[64];
-
-                    for (int i = 0; i < 64; i += 4) {
-
-
-                        points[i] = (j * dm.xdpi) + ((i / 4) * (dm.xdpi / 16)); //start x
-                        points[i + 1] = 0; //start y
-                        points[i + 2] = (j * dm.xdpi) + ((i / 4) * (dm.xdpi / 16)); //end x
-                        switch (i / 4) { //end y
-                            case 0:
-                                points[i + 3] = distancePixelMark;
-                                break;
-                            case 4:
-                            case 12:
-                                points[i + 3] = distancePixelMark / 2.6F;
-                                break;
-                            case 8:
-                                points[i + 3] = distancePixelMark / 1.6F;
-                                break;
-                            default:
-                                points[i + 3] = distancePixelMark / 8;
-                        }
-                    }
-                    if (j != 0) {
-                        //add inch line numbers
-                        int textSize = 50;
-                        paint.setTextSize(textSize);
-                        paint.setColor(Color.BLUE);
-                        canvas.drawText(Integer.toString(j), points[2] - textSize / 3, points[3] + (textSize), paint);
-                        paint.setColor(Color.BLACK);
-                    }
-                    canvas.drawLines(points, paint);
-                }
-                break;
-
+                    layoutParams.topMargin = finalPlace;
+                    v.setLayoutParams(layoutParams);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    break;
+            }
+            layout.invalidate();
+            return true;
         }
     }
 
+    private final class MyTouchListener2 implements View.OnTouchListener {
+        int orgX, orgY;
+        int offsetX, offsetY;
+        int orgXView;
+        int orgWidth, orgHeight;
+
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    orgX = (int) event.getRawX();
+                    orgY = (int) event.getRawY();
+
+                    orgWidth = v.getMeasuredWidth();
+                    orgHeight = v.getMeasuredHeight();
+
+                    orgXView = (int)v.getX();
+
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    offsetX = (int)event.getRawX() - orgX;
+                    offsetY = (int)event.getRawY() - orgY;
+                    android.support.design.widget.CoordinatorLayout.LayoutParams layoutParams = (android.support.design.widget.CoordinatorLayout.LayoutParams) v
+                            .getLayoutParams();
+                    Integer finalPlace = orgXView + offsetX;
+                    if(finalPlace < 0){
+                        finalPlace = 0;
+                    } else if(finalPlace > dm.widthPixels - 150){
+                        finalPlace = dm.widthPixels - 150;
+                    }
+                    layoutParams.leftMargin = finalPlace;
+                    v.setLayoutParams(layoutParams);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    break;
+            }
+            layout.invalidate();
+            return true;
+        }
+    }
 }

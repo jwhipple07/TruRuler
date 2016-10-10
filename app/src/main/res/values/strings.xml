@@ -16,4 +16,30 @@
         <item>1</item>
         <item>0</item>
     </string-array>
+
+
+    <string name="no_todos">Currently there are measurements saved.</string>
+    <string name="menu_insert">Add Item</string>
+    <string name="menu_delete">Delete Measurement</string>
+    <string name="todo_summary">Summary</string>
+    <string name="todo_description">Delete Measurement</string>
+    <string name="todo_edit_summary">Summary</string>
+    <string name="todo_edit_description">Description</string>
+    <string name="todo_edit_confirm">Confirm</string>
+
+    <!--NAV BAR NAMES -->
+    <string name="nav_title_calibrate">Calibrate</string>
+    <string name="nav_title_new_measure">View Saved Measurements</string>
+    <string name="nav_title_gallery">Gallery</string>
+    <string name="nav_title_slideshow">Slideshow</string>
+    <string name="nav_title_communicate">Communicate</string>
+    <string name="nav_title_share">Share</string>
+    <string name="nav_title_send">Send</string>
+
+
+    <!--measurement-->
+    <string name="save">Save</string>
+
+
+
 </resources>

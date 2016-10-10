@@ -2,6 +2,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/appBarMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -20,8 +21,21 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
-
     <include layout="@layout/content_main" />
+
+    <com.truruler.truruler.draggableMeasureView
+        android:id="@+id/DragView"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_marginTop="100dp"
+        android:clipToPadding="false"/>
+
+    <com.truruler.truruler.draggableMeasureView
+        android:id="@+id/DragViewVertical"
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="100dp"
+        android:clipToPadding="false"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -29,6 +43,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+        android:src="@android:drawable/ic_input_add" />
 
 </android.support.design.widget.CoordinatorLayout>

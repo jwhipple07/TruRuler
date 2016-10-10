@@ -10,29 +10,12 @@
 
 
 
-
-    <ScrollView
-        android:id="@+id/scrollview"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:scrollbars="none"
-        tools:context="com.truruler.truruler.MainActivity">
-        <FrameLayout
-            android:id="@+id/framelayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/imageviewTest"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </FrameLayout>
-
-    </ScrollView>
-
     <include
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"

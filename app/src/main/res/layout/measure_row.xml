@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:lines="1"
+        android:text="@+id/TextView01"
+        android:textSize="24dp"
+        android:layout_weight="0.48"
+        android:textAlignment="center">
+    </TextView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/measure_width_row"
+        android:layout_weight="1"
+        android:text="1"
+        android:textAlignment="textEnd" />
+
+    <TextView
+        android:text="X"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView8" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/measure_height_row"
+        android:layout_weight="0.20"
+        android:text="1"
+        android:textAlignment="textStart" />
+
+    <TextView
+        android:text="Inches"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/measure_type_row"
+        android:layout_weight="0.48" />
+
+
+</LinearLayout>
