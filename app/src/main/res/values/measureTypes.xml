@@ -2,8 +2,8 @@
 <resources>
 
     <string-array name="measureTypes">
-        <item>Inches</item>
         <item>CM</item>
+        <item>Inches</item>
     </string-array>
 
 </resources>

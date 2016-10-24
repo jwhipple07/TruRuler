@@ -1,4 +1,4 @@
-package com.truruler.truruler;
+package measurements;
 
 import android.app.ListActivity;
 import android.app.LoaderManager;
@@ -8,7 +8,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -19,14 +18,13 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toolbar;
+
+import com.truruler.truruler.R;
 
 import contentprovider.MeasurementsContentProvider;
-import database.DataBaseHelper;
-import database.MeasurementsTable;
 
 /*
- * TodosOverviewActivity displays the existing todo items
+ * MeasurementsOverviewActivity displays the existing measurement items
  * in a list
  *
  * You can create new ones via the ActionBar entry "Insert"
@@ -35,13 +33,9 @@ import database.MeasurementsTable;
 
 public class MeasurementsOverviewActivity extends ListActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
-    private static final int ACTIVITY_CREATE = 0;
-    private static final int ACTIVITY_EDIT = 1;
     private static final int DELETE_ID = Menu.FIRST + 1;
-    // private Cursor cursor;
     private SimpleCursorAdapter adapter;
 
-    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +47,7 @@ public class MeasurementsOverviewActivity extends ListActivity implements
         addNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createTodo();
+                createMeasurement();
             }
         });
     }
@@ -71,7 +65,7 @@ public class MeasurementsOverviewActivity extends ListActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.insert:
-                createTodo();
+                createMeasurement();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -92,7 +86,7 @@ public class MeasurementsOverviewActivity extends ListActivity implements
         return super.onContextItemSelected(item);
     }
 
-    private void createTodo() {
+    private void createMeasurement() {
         Intent i = new Intent(this, MeasurementsDetailActivity.class);
         startActivity(i);
     }
@@ -102,32 +96,30 @@ public class MeasurementsOverviewActivity extends ListActivity implements
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         Intent i = new Intent(this, MeasurementsDetailActivity.class);
-        Uri todoUri = Uri.parse(MeasurementsContentProvider.CONTENT_URI + "/" + id);
-        i.putExtra(MeasurementsContentProvider.CONTENT_ITEM_TYPE, todoUri);
+        Uri measureUri = Uri.parse(MeasurementsContentProvider.CONTENT_URI + "/" + id);
+        i.putExtra(MeasurementsContentProvider.CONTENT_ITEM_TYPE, measureUri);
 
         startActivity(i);
     }
 
 
-
     private void fillData() {
-
         // Fields from the database (projection)
         // Must include the _id column for the adapter to work
-        String[] from = new String[] { MeasurementsTable.COLUMN_ID,MeasurementsTable.COLUMN_WIDTH, MeasurementsTable.COLUMN_HEIGHT, MeasurementsTable.COLUMN_TYPE  };
+        String[] from = new String[]{MeasurementsTable.COLUMN_ID, MeasurementsTable.COLUMN_WIDTH, MeasurementsTable.COLUMN_HEIGHT, MeasurementsTable.COLUMN_TYPE,
+        MeasurementsTable.COLUMN_DESCRIPTION, MeasurementsTable.COLUMN_ORIGINAL_UPDTTM};
         // Fields on the UI to which we map
-        int[] to = new int[] { R.id.label, R.id.measure_width_row, R.id.measure_height_row, R.id.measure_type_row };
+        int[] to = new int[]{R.id.label, R.id.measure_width_row, R.id.measure_height_row, R.id.measure_type_row,
+        R.id.measure_descr_row, R.id.measure_date_row};
 
         getLoaderManager().initLoader(0, null, this);
-        adapter = new SimpleCursorAdapter(this, R.layout.measure_row, null, from,
-                to, 0);
+        adapter = new SimpleCursorAdapter(this, R.layout.measure_row, null, from, to, 0);
 
         setListAdapter(adapter);
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(0, DELETE_ID, 0, R.string.menu_delete);
     }
@@ -135,10 +127,8 @@ public class MeasurementsOverviewActivity extends ListActivity implements
     // creates a new loader after the initLoader () call
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = { MeasurementsTable.COLUMN_ID, MeasurementsTable.COLUMN_WIDTH, MeasurementsTable.COLUMN_HEIGHT, MeasurementsTable.COLUMN_TYPE };
-        CursorLoader cursorLoader = new CursorLoader(this,
-                MeasurementsContentProvider.CONTENT_URI, projection, null, null, null);
-        return cursorLoader;
+        String[] projection = {MeasurementsTable.COLUMN_ID, MeasurementsTable.COLUMN_WIDTH, MeasurementsTable.COLUMN_HEIGHT, MeasurementsTable.COLUMN_TYPE, MeasurementsTable.COLUMN_DESCRIPTION, MeasurementsTable.COLUMN_ORIGINAL_UPDTTM};
+        return new CursorLoader(this, MeasurementsContentProvider.CONTENT_URI, projection, null, null, null);
     }
 
     @Override

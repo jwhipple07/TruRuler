@@ -41,5 +41,9 @@
     <string name="save">Save</string>
 
 
+    <string-array name="image_ids">
+        <item>@drawable/menu_orders_and_lists</item>
+    </string-array>
+
 
 </resources>

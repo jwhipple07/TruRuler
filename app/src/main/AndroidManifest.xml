@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.truruler.truruler">
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,6 +12,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,24 +22,24 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="Preferences"/>
-        <activity android:name=".ResizeActivity"/>
+            android:label="Preferences" />
+        <activity android:name=".ResizeActivity" />
         <activity
-            android:name=".MeasurementsOverviewActivity"
+            android:name="measurements.MeasurementsOverviewActivity"
             android:label="Saved Measurements"
-            android:theme="@style/PopupTheme"/>
-
+            android:theme="@style/PopupTheme" />
         <activity
-            android:name=".MeasurementsDetailActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"
-            android:theme="@style/AppActionBarTheme" >
-        </activity>
+            android:name="measurements.MeasurementsDetailActivity"
+            android:theme="@style/AppActionBarTheme"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
 
         <provider
             android:name="contentprovider.MeasurementsContentProvider"
-            android:authorities="contentprovider" >
-        </provider>
-    </application>
+            android:authorities="contentprovider" />
 
+        <activity android:name=".PhotoGridActivity" />
+        <activity android:name=".PhotoDetailsActivity" />
+        <activity android:name=".DrawOnPhotoActivity"></activity>
+    </application>
 
 </manifest>

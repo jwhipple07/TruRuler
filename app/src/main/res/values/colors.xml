@@ -6,4 +6,7 @@
 
     <color name="colorDragBar">#1b205e</color>
     <color name="colorDragHandle">#6180ce</color>
+
+    <color name="blue">#00abea</color>
+    <color name="white">#ffffff</color>
 </resources>

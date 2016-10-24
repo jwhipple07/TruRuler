@@ -1,4 +1,4 @@
-package com.truruler.truruler;
+package CustomViews;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,11 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 
 /**
@@ -21,9 +20,16 @@ public class DrawView extends ImageView {
     private DisplayMetrics dm;
     private Integer type;
     private Bitmap blankBitmap;
-    private Paint paint;
+    private Paint paint, paintText;
     private float[] points;
     private Integer myMinWidth, myMinHeight;
+    private final Rect textBounds = new Rect(); //don't new this up in a draw method
+
+    public void drawTextCentered(Canvas canvas, Paint paint, String text, float cx, float cy){
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        canvas.drawText(text, cx - textBounds.exactCenterX(), cy - textBounds.exactCenterY(), paint);
+    }
+
     public DrawView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -35,6 +41,7 @@ public class DrawView extends ImageView {
         dm = getResources().getDisplayMetrics();
         blankBitmap = Bitmap.createBitmap(dm, dm.widthPixels, dm.heightPixels + dm.heightPixels, Bitmap.Config.ARGB_8888);
         paint = new Paint();
+        paintText = new Paint();
 
         points = new float[64];
         myMinWidth = dm.widthPixels;
@@ -58,9 +65,14 @@ public class DrawView extends ImageView {
         // Put our blank bitmap on ourView
        // this.setImageBitmap(blankBitmap);
 
+        int textSize = 50;
+        paintText.setTextSize(textSize);
+       // paintText.setTextAlign(Paint.Align.CENTER);
+        paintText.setColor(Color.BLUE);
+
         paint.setStrokeWidth(5);
         // Make the canvas white
-        canvas.drawColor(Color.LTGRAY);
+        canvas.drawColor(Color.WHITE);
 
         // Make the brush blue
         paint.setColor(Color.BLACK);
@@ -89,11 +101,8 @@ public class DrawView extends ImageView {
                     }
                     if (i != 0) {
                         //add inch line numbers
-                        int textSize = 50;
-                        paint.setTextSize(textSize);
-                        paint.setColor(Color.BLUE);
-                        canvas.drawText(Integer.toString(i), points[2] + 10, points[3] + (textSize / 3), paint);
-                        paint.setColor(Color.BLACK);
+                        drawTextCentered(canvas, paintText, Integer.toString(i), points[2]+25, points[3]);
+                        //canvas.drawText(Integer.toString(i), points[2], points[3], paintText);
                     }
                     canvas.drawLines(points, paint);
                 }
@@ -117,11 +126,8 @@ public class DrawView extends ImageView {
                     }
                     if (i != 0) {
                         //add inch line numbers
-                        int textSize = 50;
-                        paint.setTextSize(textSize);
-                        paint.setColor(Color.BLUE);
-                        canvas.drawText(Integer.toString(i), points[2] - textSize / 3, points[3] + (textSize), paint);
-                        paint.setColor(Color.BLACK);
+                        drawTextCentered(canvas, paintText, Integer.toString(i), points[2], points[3]+25);
+                        //canvas.drawText(Integer.toString(i), points[2], points[3], paintText);
                     }
                     canvas.drawLines(points, paint);
                 }
@@ -151,11 +157,7 @@ public class DrawView extends ImageView {
                     }
                     if (j != 0) {
                         //add inch line numbers
-                        int textSize = 50;
-                        paint.setTextSize(textSize);
-                        paint.setColor(Color.BLUE);
-                        canvas.drawText(Integer.toString(j), points[2] + 10, points[3] + (textSize / 3), paint);
-                        paint.setColor(Color.BLACK);
+                        drawTextCentered(canvas, paintText, Integer.toString(j), points[2]+25, points[3]);
                     }
                     canvas.drawLines(points, paint);
                 }
@@ -182,11 +184,7 @@ public class DrawView extends ImageView {
                     }
                     if (j != 0) {
                         //add inch line numbers
-                        int textSize = 50;
-                        paint.setTextSize(textSize);
-                        paint.setColor(Color.BLUE);
-                        canvas.drawText(Integer.toString(j), points[2] - textSize / 3, points[3] + (textSize), paint);
-                        paint.setColor(Color.BLACK);
+                        drawTextCentered(canvas, paintText, Integer.toString(j), points[2], points[3]+25);
                     }
                     canvas.drawLines(points, paint);
                 }

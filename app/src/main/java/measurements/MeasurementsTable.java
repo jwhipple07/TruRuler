@@ -1,11 +1,8 @@
-package database;
+package measurements;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-/**
- * Created by JW043373 on 9/29/2016.
- */
 public class MeasurementsTable {
     // Database table
     public static final String TABLE_MEASUREMENTS = "measurements";

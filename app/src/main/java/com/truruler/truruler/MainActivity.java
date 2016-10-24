@@ -1,20 +1,10 @@
 package com.truruler.truruler;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,22 +17,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.Date;
 
+import CustomViews.DrawView;
+import CustomViews.draggableMeasureView;
+import measurements.MeasurementsDetailActivity;
+import measurements.MeasurementsOverviewActivity;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private GestureDetector mGestureDetector;
-    private android.support.design.widget.CoordinatorLayout layout;
+    private android.widget.FrameLayout layout;
     private draggableMeasureView draggable;
     private draggableMeasureView draggableVertical;
+    private android.support.design.widget.FloatingActionButton floatButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +42,13 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
-        // Bind the gestureDetector to GestureListener
-        mGestureDetector = new GestureDetector(this, new GestureListener());
+        layout = (android.widget.FrameLayout)findViewById(R.id.mainLayout);
+        draggable = (draggableMeasureView) findViewById(R.id.DragView);
+        draggable.setOnTouchListener(new MyTouchListener());
+        draggable.bringToFront();
+        draggableVertical = (draggableMeasureView) findViewById(R.id.DragViewVertical);
+        draggableVertical.verticalFlag = true;
+        draggableVertical.setOnTouchListener(new MyTouchListener2());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -59,12 +56,17 @@ public class MainActivity extends AppCompatActivity
        // draw(R.id.imageviewTest);
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        floatButton = (FloatingActionButton) findViewById(R.id.fab);
+        floatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent i = new Intent(getBaseContext(), MeasurementsDetailActivity.class);
+
+                i.putExtra("width", draggable.currentLocation);
+                i.putExtra("height", draggableVertical.currentLocation);
+                startActivity(i);
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         });
 
@@ -80,7 +82,7 @@ public class MainActivity extends AppCompatActivity
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 
-        com.truruler.truruler.DrawView main = (com.truruler.truruler.DrawView) findViewById(R.id.DrawView);
+        DrawView main = (DrawView) findViewById(R.id.DrawView);
         main.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -88,9 +90,15 @@ public class MainActivity extends AppCompatActivity
                     if (getSupportActionBar().isShowing()) {
                         getSupportActionBar().hide();
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                        draggableVertical.setVisibility(View.VISIBLE);
+                        draggable.setVisibility(View.VISIBLE);
+                        floatButton.setVisibility(View.VISIBLE);
                     } else {
                         getSupportActionBar().show();
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                        draggableVertical.setVisibility(View.INVISIBLE);
+                        draggable.setVisibility(View.INVISIBLE);
+                        floatButton.setVisibility(View.INVISIBLE);
                     }
                 } catch (NullPointerException ne){
                     Toast.makeText(getBaseContext(), "There is no action bar", Toast.LENGTH_SHORT).show();
@@ -98,13 +106,6 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
-
-        layout = (android.support.design.widget.CoordinatorLayout)findViewById(R.id.appBarMain);
-        draggable = (draggableMeasureView) findViewById(R.id.DragView);
-        draggable.setOnTouchListener(new MyTouchListener());
-        draggableVertical = (draggableMeasureView) findViewById(R.id.DragViewVertical);
-        draggableVertical.verticalFlag = true;
-        draggableVertical.setOnTouchListener(new MyTouchListener2());
     }
     @Override
     protected void onResume(){
@@ -132,9 +133,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -149,12 +147,13 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_gallery) {
-            Toast.makeText(getBaseContext(),"This is empty for now", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, PhotoGridActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_calibrate) {
             Intent intent = new Intent(this, ResizeActivity.class);
             startActivity(intent);
@@ -162,7 +161,8 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, MeasurementsOverviewActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_slideshow) {
-            Toast.makeText(getBaseContext(),"This is empty for now", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, DrawOnPhotoActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
             Toast.makeText(getBaseContext(),"This is empty for now", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_send) {
@@ -179,9 +179,12 @@ public class MainActivity extends AppCompatActivity
         int orgYView;
         int orgWidth, orgHeight;
 
+
         DisplayMetrics dm = getResources().getDisplayMetrics();
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            draggableMeasureView j = (draggableMeasureView) v;
+            v.bringToFront();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     orgX = (int) event.getRawX();
@@ -196,15 +199,16 @@ public class MainActivity extends AppCompatActivity
                 case MotionEvent.ACTION_MOVE:
                     offsetX = (int)event.getRawX() - orgX;
                     offsetY = (int)event.getRawY() - orgY;
-                    android.support.design.widget.CoordinatorLayout.LayoutParams layoutParams = (android.support.design.widget.CoordinatorLayout.LayoutParams) v
+                    android.widget.FrameLayout.LayoutParams layoutParams = (android.widget.FrameLayout.LayoutParams) v
                             .getLayoutParams();
                     Integer finalPlace = orgYView + offsetY;
                     if(finalPlace < 0){
                         finalPlace = 0;
-                    } else if(finalPlace > dm.heightPixels - 150){
-                        finalPlace = dm.heightPixels - 150;
+                    } else if(finalPlace > dm.heightPixels - 100){
+                        finalPlace = dm.heightPixels - 100;
                     }
                     layoutParams.topMargin = finalPlace;
+                    j.setConversion(finalPlace);
                     v.setLayoutParams(layoutParams);
                     break;
                 case MotionEvent.ACTION_UP:
@@ -224,11 +228,12 @@ public class MainActivity extends AppCompatActivity
         DisplayMetrics dm = getResources().getDisplayMetrics();
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            draggableMeasureView j = (draggableMeasureView) v;
+            v.bringToFront();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     orgX = (int) event.getRawX();
                     orgY = (int) event.getRawY();
-
                     orgWidth = v.getMeasuredWidth();
                     orgHeight = v.getMeasuredHeight();
 
@@ -236,18 +241,19 @@ public class MainActivity extends AppCompatActivity
 
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    offsetX = (int)event.getRawX() - orgX;
-                    offsetY = (int)event.getRawY() - orgY;
-                    android.support.design.widget.CoordinatorLayout.LayoutParams layoutParams = (android.support.design.widget.CoordinatorLayout.LayoutParams) v
+                    offsetX = (int) event.getRawX() - orgX;
+                    offsetY = (int) event.getRawY() - orgY;
+                    android.widget.FrameLayout.LayoutParams layoutParams = (android.widget.FrameLayout.LayoutParams) v
                             .getLayoutParams();
                     Integer finalPlace = orgXView + offsetX;
-                    if(finalPlace < 0){
+                    if (finalPlace < 0) {
                         finalPlace = 0;
-                    } else if(finalPlace > dm.widthPixels - 150){
-                        finalPlace = dm.widthPixels - 150;
+                    } else if (finalPlace > dm.widthPixels - 100) {
+                        finalPlace = dm.widthPixels - 100;
                     }
                     layoutParams.leftMargin = finalPlace;
                     v.setLayoutParams(layoutParams);
+                    j.setConversion(finalPlace);
                     break;
                 case MotionEvent.ACTION_UP:
                     break;
@@ -256,4 +262,6 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
     }
+
+
 }

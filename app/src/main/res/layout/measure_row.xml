@@ -1,48 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:lines="1"
-        android:text="@+id/TextView01"
-        android:textSize="24dp"
-        android:layout_weight="0.48"
-        android:textAlignment="center">
-    </TextView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/measure_width_row"
-        android:layout_weight="1"
-        android:text="1"
-        android:textAlignment="textEnd" />
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:lines="1"
+            android:text="1"
+            android:textAlignment="center"
+            android:textSize="24sp"/>
 
-    <TextView
-        android:text="X"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView8" />
+        <TextView
+            android:id="@+id/measure_descr_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:maxWidth="150dp"
+            android:paddingBottom="15dp"
+            android:text="Inches"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/measure_height_row"
-        android:layout_weight="0.20"
-        android:text="1"
-        android:textAlignment="textStart" />
+        <TextView
+            android:id="@+id/measure_date_row"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="25dp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="date"
+            android:minWidth="200dp"
+            android:textStyle="normal|italic" />
 
-    <TextView
-        android:text="Inches"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/measure_type_row"
-        android:layout_weight="0.48" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true">
+
+            <TextView
+                android:id="@+id/measure_width_row"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textAlignment="textEnd"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"
+                android:textStyle="normal|bold" />
+
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="X"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp" />
+
+
+            <TextView
+                android:id="@+id/measure_height_row"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textAlignment="textStart"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"
+                android:textStyle="normal|bold" />
+
+
+            <TextView
+                android:id="@+id/measure_type_row"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Inches"
+                android:gravity="end"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:textAllCaps="false"
+                android:textStyle="normal|bold" />
+
+        </LinearLayout>
+    </RelativeLayout>
 
 
 </LinearLayout>

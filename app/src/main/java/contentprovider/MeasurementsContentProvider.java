@@ -11,36 +11,32 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import database.DataBaseHelper;
-import database.MeasurementsTable;
+import measurements.MeasurementsTable;
 
+@SuppressWarnings("ConstantConditions")
 public class MeasurementsContentProvider extends ContentProvider {
 
     // database
     private DataBaseHelper database;
 
-    // used for the UriMacher
-    private static final int TODOS = 10;
-    private static final int TODO_ID = 20;
+    // used for the UriMatcher
+    private static final int MEASURE = 10;
+    private static final int MEASURE_ID = 20;
 
     private static final String AUTHORITY = "contentprovider";
+    private static final String BASE_PATH = "measures";
+    private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
+//    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/measures";
+    public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/measure";
 
-    private static final String BASE_PATH = "todos";
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
-            + "/" + BASE_PATH);
-
-    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-            + "/todos";
-    public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-            + "/todo";
-
-    private static final UriMatcher sURIMatcher = new UriMatcher(
-            UriMatcher.NO_MATCH);
     static {
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH, TODOS);
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", TODO_ID);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH, MEASURE);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", MEASURE_ID);
     }
 
     @Override
@@ -50,10 +46,10 @@ public class MeasurementsContentProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection,
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
-        // Uisng SQLiteQueryBuilder instead of query() method
+        // Using SQLiteQueryBuilder instead of query() method
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 
         // check if the caller has requested a column which does not exists
@@ -64,9 +60,9 @@ public class MeasurementsContentProvider extends ContentProvider {
 
         int uriType = sURIMatcher.match(uri);
         switch (uriType) {
-            case TODOS:
+            case MEASURE:
                 break;
-            case TODO_ID:
+            case MEASURE_ID:
                 // adding the ID to the original query
                 queryBuilder.appendWhere(MeasurementsTable.COLUMN_ID + "="
                         + uri.getLastPathSegment());
@@ -85,17 +81,17 @@ public class MeasurementsContentProvider extends ContentProvider {
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         return null;
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqlDB = database.getWritableDatabase();
-        long id = 0;
+        long id;
         switch (uriType) {
-            case TODOS:
+            case MEASURE:
                 id = sqlDB.insert(MeasurementsTable.TABLE_MEASUREMENTS, null, values);
                 break;
             default:
@@ -106,16 +102,16 @@ public class MeasurementsContentProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqlDB = database.getWritableDatabase();
-        int rowsDeleted = 0;
+        int rowsDeleted;
         switch (uriType) {
-            case TODOS:
+            case MEASURE:
                 rowsDeleted = sqlDB.delete(MeasurementsTable.TABLE_MEASUREMENTS, selection,
                         selectionArgs);
                 break;
-            case TODO_ID:
+            case MEASURE_ID:
                 String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
                     rowsDeleted = sqlDB.delete(
@@ -133,25 +129,26 @@ public class MeasurementsContentProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
+
         getContext().getContentResolver().notifyChange(uri, null);
         return rowsDeleted;
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection,
+    public int update(@NonNull Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
 
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqlDB = database.getWritableDatabase();
-        int rowsUpdated = 0;
+        int rowsUpdated;
         switch (uriType) {
-            case TODOS:
+            case MEASURE:
                 rowsUpdated = sqlDB.update(MeasurementsTable.TABLE_MEASUREMENTS,
                         values,
                         selection,
                         selectionArgs);
                 break;
-            case TODO_ID:
+            case MEASURE_ID:
                 String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
                     rowsUpdated = sqlDB.update(MeasurementsTable.TABLE_MEASUREMENTS,
@@ -175,13 +172,13 @@ public class MeasurementsContentProvider extends ContentProvider {
     }
 
     private void checkColumns(String[] projection) {
-        String[] available = { MeasurementsTable.COLUMN_DESCRIPTION, MeasurementsTable.COLUMN_HEIGHT,
+        String[] available = {MeasurementsTable.COLUMN_DESCRIPTION, MeasurementsTable.COLUMN_HEIGHT,
                 MeasurementsTable.COLUMN_ID, MeasurementsTable.COLUMN_LAST_UPDTTM, MeasurementsTable.COLUMN_ORIGINAL_UPDTTM,
                 MeasurementsTable.COLUMN_WIDTH, MeasurementsTable.COLUMN_TYPE};
         if (projection != null) {
-            HashSet<String> requestedColumns = new HashSet<String>(
+            HashSet<String> requestedColumns = new HashSet<>(
                     Arrays.asList(projection));
-            HashSet<String> availableColumns = new HashSet<String>(
+            HashSet<String> availableColumns = new HashSet<>(
                     Arrays.asList(available));
             // check if all columns which are requested are available
             if (!availableColumns.containsAll(requestedColumns)) {

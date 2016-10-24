@@ -4,28 +4,19 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import database.MeasurementsTable;
+import measurements.MeasurementsTable;
 
-/**
- * Created by JW043373 on 9/29/2016.
- */
 public class DataBaseHelper extends SQLiteOpenHelper{
 
     private static final String DB_NAME = "measurementstable.db";
 
-    private SQLiteDatabase myDataBase;
-
-    private final Context myContext;
-
     /**
      * Constructor
      * Takes and keeps a reference of the passed context in order to access to the application assets and resources.
-     * @param context
+     * @param context -
      */
     public DataBaseHelper(Context context) {
-
         super(context, DB_NAME, null, 1);
-        this.myContext = context;
     }
 
     @Override
