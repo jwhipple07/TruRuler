@@ -84,7 +84,7 @@ public class ResizeActivity extends AppCompatActivity {
                 case MotionEvent.ACTION_UP:
                     //get final width
                     int j = v.getMeasuredHeight();
-                    
+
                     Assert.assertTrue(j > 0);
 
                     float actualYdpi = j / 2.125F;
