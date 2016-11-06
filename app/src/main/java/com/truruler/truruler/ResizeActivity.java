@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import junit.framework.Assert;
+
 public class ResizeActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
 
@@ -82,6 +84,8 @@ public class ResizeActivity extends AppCompatActivity {
                 case MotionEvent.ACTION_UP:
                     //get final width
                     int j = v.getMeasuredHeight();
+                    
+                    Assert.assertTrue(j > 0);
 
                     float actualYdpi = j / 2.125F;
                     sharedPreferences.edit().putFloat("ydpi", actualYdpi).apply();

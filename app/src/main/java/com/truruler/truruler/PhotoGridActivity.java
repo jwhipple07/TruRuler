@@ -1,57 +1,81 @@
 package com.truruler.truruler;
 
 import android.content.Intent;
-import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
 
+import java.io.File;
 import java.util.ArrayList;
 
-import photoGrid.PhotoGridAdapter;
-import photoGrid.PhotoHolder;
-import photoGrid.PhotoItem;
+import photoViewer.DetailActivity;
+import photoViewer.GalleryAdapter;
+import photoViewer.ImageModel;
+import photoViewer.RecyclerItemClickListener;
 
-public class PhotoGridActivity extends ActionBarActivity {
-    private GridView gridView;
-    private PhotoGridAdapter gridAdapter;
+public class PhotoGridActivity extends AppCompatActivity {
+
+    GalleryAdapter mAdapter;
+    RecyclerView mRecyclerView;
+
+    ArrayList<ImageModel> data = new ArrayList<>();
+
+    public static File imgFolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_grid);
-
-        gridView = (GridView) findViewById(R.id.gridView);
-        gridAdapter = new PhotoGridAdapter(this, R.layout.grid_item_layout, getData());
-        gridView.setAdapter(gridAdapter);
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                PhotoItem item = (PhotoItem) parent.getItemAtPosition(position);
-                //Create intent
-                Intent intent = new Intent(PhotoGridActivity.this, PhotoDetailsActivity.class);
-                //set photoHolder to pass data
-                PhotoHolder.setPhoto(item);
-
-                //Start details activity
-                startActivity(intent);
+        imgFolder = new File(Environment.getExternalStorageDirectory(), "MyImages");
+        try {
+            for (File img : imgFolder.listFiles()) {
+                ImageModel imageModel = new ImageModel();
+                imageModel.setName("Image " + img.getName());
+                imageModel.setUrl(img.getAbsolutePath());
+                data.add(imageModel);
             }
-        });
+        } catch(Exception e){
+            //no images found in folder.
+            imgFolder.mkdir();
+        }
+//        for (int i = 0; i < IMGS.length; i++) {
+//
+//            ImageModel imageModel = new ImageModel();
+//            imageModel.setName("Image " + i);
+//            imageModel.setUrl(IMGS[i]);
+//            data.add(imageModel);
+//
+//        }
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        mRecyclerView.setHasFixedSize(true);
+
+
+        mAdapter = new GalleryAdapter(PhotoGridActivity.this, data);
+        mRecyclerView.setAdapter(mAdapter);
+
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this,
+                new RecyclerItemClickListener.OnItemClickListener() {
+
+                    @Override
+                    public void onItemClick(View view, int position) {
+
+                        Intent intent = new Intent(PhotoGridActivity.this, DetailActivity.class);
+                        intent.putParcelableArrayListExtra("data", data);
+                        intent.putExtra("pos", position);
+                        startActivity(intent);
+
+                    }
+                }));
+
     }
 
-    // Prepare some dummy data for gridview
-    private ArrayList<PhotoItem> getData() {
-        final ArrayList<PhotoItem> imageItems = new ArrayList<>();
-        TypedArray imgs = getResources().obtainTypedArray(R.array.image_ids);
-        for (int i = 0; i < imgs.length(); i++) {
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imgs.getResourceId(i, -1));
-            imageItems.add(new PhotoItem(bitmap, "Image#" + i));
-        }
-        return imageItems;
-    }
 }

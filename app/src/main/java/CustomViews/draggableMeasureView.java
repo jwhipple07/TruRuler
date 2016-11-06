@@ -25,9 +25,6 @@ public class draggableMeasureView extends View {
     public Float currentLocation = 0F;
     private SharedPreferences sharedPreferences;
 
-    int offsetY=0;
-
-    int orgHeight=0;
     public boolean verticalFlag = false;
 
     public draggableMeasureView(Context context, AttributeSet attrs) {
@@ -68,7 +65,7 @@ public class draggableMeasureView extends View {
         paint.setShader(new LinearGradient(0, 0, 0, getHeight(), ContextCompat.getColor(getContext(),R.color.colorDragBar), ContextCompat.getColor(getContext(),R.color.colorDragHandle), Shader.TileMode.MIRROR));
 
         if(verticalFlag){
-            canvas.drawLine(50, orgHeight + offsetY, 50, myMinHeight, paint);
+            canvas.drawLine(50, 0, 50, myMinHeight, paint);
             canvas.drawCircle(50, dm.heightPixels, 100, paint);
             paintText.setColor(Color.LTGRAY);
             paintText.setTextSize(50);
@@ -89,7 +86,6 @@ public class draggableMeasureView extends View {
     }
 
     public void setConversion(Integer pixels){
-
         float deviceActualDpi;
         if(verticalFlag){
             deviceActualDpi = dm.xdpi;

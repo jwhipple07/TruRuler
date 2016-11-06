@@ -1,9 +1,13 @@
 package com.truruler.truruler;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -20,7 +24,9 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import CustomViews.DrawView;
@@ -35,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     private draggableMeasureView draggable;
     private draggableMeasureView draggableVertical;
     private android.support.design.widget.FloatingActionButton floatButton;
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,9 +171,23 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, DrawOnPhotoActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_share) {
-            Toast.makeText(getBaseContext(),"This is empty for now", Toast.LENGTH_SHORT).show();
+            Intent imageIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+//folder stuff
+            File imagesFolder = new File(Environment.getExternalStorageDirectory(), "MyImages");
+            imagesFolder.mkdirs();
+
+            File image = new File(imagesFolder, "QR_" + timeStamp + ".png");
+            Uri uriSavedImage = FileProvider.getUriForFile(MainActivity.this,
+                    BuildConfig.APPLICATION_ID + ".provider",
+                    image);
+
+            imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriSavedImage);
+            startActivityForResult(imageIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         } else if (id == R.id.nav_send) {
-            Toast.makeText(getBaseContext(),"This is empty for now", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, test.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

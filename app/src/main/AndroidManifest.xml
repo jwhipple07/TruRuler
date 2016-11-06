@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.truruler.truruler">
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -36,10 +39,24 @@
         <provider
             android:name="contentprovider.MeasurementsContentProvider"
             android:authorities="contentprovider" />
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
 
-        <activity android:name=".PhotoGridActivity" />
-        <activity android:name=".PhotoDetailsActivity" />
-        <activity android:name=".DrawOnPhotoActivity"></activity>
+        <activity android:name=".DrawOnPhotoActivity" />
+        <activity
+            android:name=".PhotoGridActivity"
+            android:theme="@style/AppTheme2" />
+        <activity
+            android:name="photoViewer.DetailActivity"
+            android:theme="@style/AppTheme2" />
+        <activity android:name=".test"></activity>
     </application>
 
 </manifest>

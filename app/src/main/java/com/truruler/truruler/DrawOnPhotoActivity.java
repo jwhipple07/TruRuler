@@ -13,6 +13,7 @@ package com.truruler.truruler;
         import android.graphics.Color;
         import android.graphics.Matrix;
         import android.graphics.Paint;
+        import android.graphics.drawable.Drawable;
         import android.net.Uri;
         import android.os.Bundle;
         import android.provider.SyncStateContract;
@@ -25,12 +26,19 @@ package com.truruler.truruler;
         import android.view.View.OnClickListener;
         import android.view.View.OnTouchListener;
         import android.widget.Button;
+        import android.widget.FrameLayout;
         import android.widget.ImageView;
         import java.io.OutputStream;
+        import java.util.ArrayList;
+        import java.util.List;
+
         import android.content.ContentValues;
         import android.graphics.Bitmap.CompressFormat;
         import android.provider.MediaStore.Images.Media;
         import android.widget.Toast;
+
+        import Sticker.StickerImageView;
+        import Sticker.StickerView;
 
 public class DrawOnPhotoActivity extends Activity implements OnClickListener,
         OnTouchListener {
@@ -42,6 +50,7 @@ public class DrawOnPhotoActivity extends Activity implements OnClickListener,
     Bitmap bmp;
     Bitmap alteredBitmap;
     Canvas canvas;
+    FrameLayout fl;
     Paint paint;
     Matrix matrix;
     float downx = 0;
@@ -49,6 +58,8 @@ public class DrawOnPhotoActivity extends Activity implements OnClickListener,
     float upx = 0;
     float upy = 0;
 
+    List<StickerView> allStickerViews = new ArrayList<>();
+    Button addNew;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +78,40 @@ public class DrawOnPhotoActivity extends Activity implements OnClickListener,
 
         savePicture.setOnClickListener(this);
         choosePicture.setOnClickListener(this);
-        choosenImageView.setOnTouchListener(this);
+        //choosenImageView.setOnTouchListener(this);
+
+
+        fl = (FrameLayout) findViewById(R.id.DrawOnFrameLayout);
+        addNew = (Button) findViewById(R.id.AddNewLengthButton);
+
+
+//// add a stickerImage to canvas
+//        iv_sticker = new StickerImageView(test.this);
+//        iv_sticker.setImageDrawable(getResources().getDrawable(R.drawable.arrow));
+
+        addNew.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StickerImageView iv_sticker = new StickerImageView(DrawOnPhotoActivity.this);
+                iv_sticker.setImageDrawable(getResources().getDrawable(R.drawable.arrow));
+                allStickerViews.add(iv_sticker);
+                fl.addView(iv_sticker);
+            }
+        });
+
+        fl.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                for(StickerView s : allStickerViews) {
+                    if(s!= null)
+                        s.setControlsVisibility(false);
+                }
+                //tv_sticker.setControlsVisibility(false);
+                return true;
+            }
+        });
+
+
     }
 
     public void onClick(View v) {
@@ -76,13 +120,15 @@ public class DrawOnPhotoActivity extends Activity implements OnClickListener,
                     Intent.ACTION_PICK,
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(choosePictureIntent, 0);
-            Toast.makeText(this, "load!", Toast.LENGTH_SHORT).show();
         } else if (v == savePicture) {
 
             if (alteredBitmap != null) {
                 ContentValues contentValues = new ContentValues(3);
                 contentValues.put(Media.DISPLAY_NAME, "Draw On Me");
-
+                for(StickerView sv : allStickerViews){
+                    alteredBitmap = createSingleImageFromMultipleImages(alteredBitmap, getBitmapFromView(sv) );
+                }
+                Log.v("EXCEPTION", "");
                 Uri imageFileUri = getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, contentValues);
                 try {
                     OutputStream imageFileOS = getContentResolver().openOutputStream(imageFileUri);
@@ -97,6 +143,32 @@ public class DrawOnPhotoActivity extends Activity implements OnClickListener,
         }
     }
 
+    private Bitmap createSingleImageFromMultipleImages(Bitmap firstImage, Bitmap secondImage){
+
+        Bitmap result = Bitmap.createBitmap(firstImage.getWidth(), firstImage.getHeight(), firstImage.getConfig());
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(firstImage, 0f, 0f, null);
+        canvas.drawBitmap(secondImage, 10, 10, null);
+        return result;
+    }
+    public static Bitmap getBitmapFromView(View view) {
+        //Define a bitmap with the same size as the view
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),Bitmap.Config.ARGB_8888);
+        //Bind a canvas to it
+        Canvas canvas = new Canvas(returnedBitmap);
+        //Get the view's background
+        Drawable bgDrawable =view.getBackground();
+        if (bgDrawable!=null)
+            //has background drawable, then draw it on the canvas
+            bgDrawable.draw(canvas);
+        else
+            //does not have background drawable, then draw white background on the canvas
+            //canvas.drawColor(Color.WHITE);
+        // draw the view on the canvas
+        view.draw(canvas);
+        //return the bitmap
+        return returnedBitmap;
+    }
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -122,8 +194,8 @@ public class DrawOnPhotoActivity extends Activity implements OnClickListener,
                 matrix = new Matrix();
                 canvas.drawBitmap(bmp, matrix, paint);
 
-                choosenImageView.setImageBitmap(alteredBitmap);
-                choosenImageView.setOnTouchListener(this);
+                choosenImageView.setImageBitmap(bmp);
+                //choosenImageView.setOnTouchListener(this);
             } catch (Exception e) {
                 Log.v("ERROR", e.toString());
             }
@@ -135,6 +207,7 @@ public class DrawOnPhotoActivity extends Activity implements OnClickListener,
             case MotionEvent.ACTION_DOWN:
                 downx = event.getRawX();
                 downy = event.getRawY();
+                Toast.makeText(getBaseContext(), downx + " " + downy, Toast.LENGTH_SHORT).show();
                 break;
             case MotionEvent.ACTION_MOVE:
                 upx = event.getRawX();
