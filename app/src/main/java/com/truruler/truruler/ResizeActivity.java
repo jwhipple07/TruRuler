@@ -23,6 +23,10 @@ public class ResizeActivity extends AppCompatActivity {
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if(AssertSettings.PRIORITY2_ASSERTIONS){
+            Assert.assertNotNull(dm);
+        }
+
         float storedYdpi = sharedPreferences.getFloat("ydpi", dm.ydpi);
         //create size of credit card
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(200, (int) (2.125 * storedYdpi));
@@ -85,7 +89,9 @@ public class ResizeActivity extends AppCompatActivity {
                     //get final width
                     int j = v.getMeasuredHeight();
 
-                    Assert.assertTrue(j > 0);
+                    if(AssertSettings.PRIORITY1_ASSERTIONS) {
+                        Assert.assertTrue(j > 0);
+                    }
 
                     float actualYdpi = j / 2.125F;
                     sharedPreferences.edit().putFloat("ydpi", actualYdpi).apply();

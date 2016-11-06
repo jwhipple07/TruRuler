@@ -12,6 +12,10 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
+import com.truruler.truruler.AssertSettings;
+
+import junit.framework.Assert;
+
 /**
  * Created by JW043373 on 9/19/2016.
  */
@@ -77,6 +81,10 @@ public class DrawView extends ImageView {
         // Make the brush blue
         paint.setColor(Color.BLACK);
         float distancePixelMark = dm.widthPixels / 5F;
+        if(AssertSettings.PRIORITY1_ASSERTIONS){
+            //make sure that the type is set to 0 or 1
+            Assert.assertTrue(this.type == 0 || this.type == 1);
+        }
         switch (type) {
 
             case 0: //metric
@@ -189,6 +197,7 @@ public class DrawView extends ImageView {
                     canvas.drawLines(points, paint);
                 }
                 break;
+
 
         }
     }
