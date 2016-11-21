@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
-import android.view.GestureDetector;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -28,6 +28,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import CustomViews.DrawView;
 import CustomViews.draggableMeasureView;
@@ -49,34 +50,37 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
+        //set layout
         layout = (android.widget.FrameLayout)findViewById(R.id.mainLayout);
+
+        //The horizontal drag measurer
         draggable = (draggableMeasureView) findViewById(R.id.DragView);
-        draggable.setOnTouchListener(new MyTouchListener());
+        draggable.setOnTouchListener(new horizontalDragViewListener());
         draggable.bringToFront();
+
+        //The vertical drag measurer
         draggableVertical = (draggableMeasureView) findViewById(R.id.DragViewVertical);
         draggableVertical.verticalFlag = true;
-        draggableVertical.setOnTouchListener(new MyTouchListener2());
+        draggableVertical.setOnTouchListener(new verticalDragViewListener());
 
+        //custom toolbar for the drawer theme
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-       // draw(R.id.imageviewTest);
-
-
         floatButton = (FloatingActionButton) findViewById(R.id.fab);
+
+        //Save measurement by clicking the + symbol
         floatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getBaseContext(), MeasurementsDetailActivity.class);
-
                 i.putExtra("width", draggable.currentLocation);
                 i.putExtra("height", draggableVertical.currentLocation);
                 startActivity(i);
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
             }
         });
 
+        //Drawer layout stuff
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -85,10 +89,13 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //automatically hide the menu bar and status bar on load
         getSupportActionBar().hide();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 
+        //toggle between showing the drag bars or the menu bar by long click
         DrawView main = (DrawView) findViewById(R.id.DrawView);
         main.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -114,6 +121,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
     @Override
     protected void onResume(){
         super.onResume();
@@ -141,8 +149,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
@@ -167,16 +173,18 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_add_new_measurement) {
             Intent intent = new Intent(this, MeasurementsOverviewActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_edit_photo) {
             Intent intent = new Intent(this, DrawOnPhotoActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_take_photo) {
             Intent imageIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
 
-//folder stuff
+            //folder stuff
             File imagesFolder = new File(Environment.getExternalStorageDirectory(), "MyImages");
-            imagesFolder.mkdirs();
+            if(imagesFolder.mkdirs()){
+                Log.i("","Folder created");
+            }
 
             File image = new File(imagesFolder, "QR_" + timeStamp + ".png");
             Uri uriSavedImage = FileProvider.getUriForFile(MainActivity.this,
@@ -185,16 +193,21 @@ public class MainActivity extends AppCompatActivity
 
             imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriSavedImage);
             startActivityForResult(imageIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-        } else if (id == R.id.nav_send) {
-            Intent intent = new Intent(this, test.class);
-            startActivity(intent);
         }
+//        else if (id == R.id.nav_send) {
+//            Intent intent = new Intent(this, StickerTest.class);
+//            startActivity(intent);
+//        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-    private final class MyTouchListener implements View.OnTouchListener {
+
+    /**
+     * This listener is for the horizontal drag view
+     */
+    private final class horizontalDragViewListener implements View.OnTouchListener {
         int orgX, orgY;
         int offsetX, offsetY;
         int orgYView;
@@ -204,7 +217,7 @@ public class MainActivity extends AppCompatActivity
         DisplayMetrics dm = getResources().getDisplayMetrics();
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            draggableMeasureView j = (draggableMeasureView) v;
+            draggableMeasureView draggable = (draggableMeasureView) v;
             v.bringToFront();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -229,7 +242,7 @@ public class MainActivity extends AppCompatActivity
                         finalPlace = dm.heightPixels - 100;
                     }
                     layoutParams.topMargin = finalPlace;
-                    j.setConversion(finalPlace);
+                    draggable.setConversion(finalPlace);
                     v.setLayoutParams(layoutParams);
                     break;
                 case MotionEvent.ACTION_UP:
@@ -240,7 +253,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private final class MyTouchListener2 implements View.OnTouchListener {
+    /**
+     * This listener is for the vertical drag view
+     */
+    private final class verticalDragViewListener implements View.OnTouchListener {
         int orgX, orgY;
         int offsetX, offsetY;
         int orgXView;
@@ -249,7 +265,7 @@ public class MainActivity extends AppCompatActivity
         DisplayMetrics dm = getResources().getDisplayMetrics();
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            draggableMeasureView j = (draggableMeasureView) v;
+            draggableMeasureView draggable = (draggableMeasureView) v;
             v.bringToFront();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -274,7 +290,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     layoutParams.leftMargin = finalPlace;
                     v.setLayoutParams(layoutParams);
-                    j.setConversion(finalPlace);
+                    draggable.setConversion(finalPlace);
                     break;
                 case MotionEvent.ACTION_UP:
                     break;

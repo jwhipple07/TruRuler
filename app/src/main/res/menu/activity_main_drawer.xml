@@ -3,33 +3,33 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_calibrate"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="@string/nav_title_calibrate" />
-        <item
-            android:id="@+id/nav_add_new_measurement"
-            android:icon="@drawable/ic_add_new"
-            android:title="@string/nav_title_new_measure" />
-        <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/nav_title_gallery" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/nav_title_slideshow" />
+            android:id="@+id/nav_edit_photo"
+            android:icon="@drawable/ic_menu_palette"
+            android:title="@string/nav_title_edit_photo" />
+        <item
+            android:id="@+id/nav_take_photo"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/nav_title_take_photo" />
     </group>
 
-    <item android:title="@string/nav_title_communicate">
+    <item android:title="@string/nav_title_tools">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="@string/nav_title_share" />
+                android:id="@+id/nav_calibrate"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="@string/nav_title_calibrate" />
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="@string/nav_title_send" />
+                android:id="@+id/nav_add_new_measurement"
+                android:icon="@drawable/ic_menu_view_list"
+                android:title="@string/nav_title_new_measure" />
+            <!--<item-->
+                <!--android:id="@+id/nav_send"-->
+                <!--android:icon="@drawable/ic_menu_send"-->
+                <!--android:title="@string/nav_title_send" />-->
         </menu>
     </item>
 

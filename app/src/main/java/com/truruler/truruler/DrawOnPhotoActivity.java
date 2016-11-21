@@ -86,7 +86,7 @@ public class DrawOnPhotoActivity extends Activity implements OnClickListener,
 
 
 //// add a stickerImage to canvas
-//        iv_sticker = new StickerImageView(test.this);
+//        iv_sticker = new StickerImageView(StickerTest.this);
 //        iv_sticker.setImageDrawable(getResources().getDrawable(R.drawable.arrow));
 
         addNew.setOnClickListener(new View.OnClickListener() {

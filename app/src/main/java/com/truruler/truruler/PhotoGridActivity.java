@@ -19,11 +19,9 @@ import photoViewer.RecyclerItemClickListener;
 
 public class PhotoGridActivity extends AppCompatActivity {
 
-    GalleryAdapter mAdapter;
-    RecyclerView mRecyclerView;
-
-    ArrayList<ImageModel> data = new ArrayList<>();
-
+    private GalleryAdapter mAdapter;
+    private RecyclerView mRecyclerView;
+    private ArrayList<ImageModel> data = new ArrayList<>();
     public static File imgFolder;
 
     @Override
@@ -42,14 +40,6 @@ public class PhotoGridActivity extends AppCompatActivity {
             //no images found in folder.
             imgFolder.mkdir();
         }
-//        for (int i = 0; i < IMGS.length; i++) {
-//
-//            ImageModel imageModel = new ImageModel();
-//            imageModel.setName("Image " + i);
-//            imageModel.setUrl(IMGS[i]);
-//            data.add(imageModel);
-//
-//        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

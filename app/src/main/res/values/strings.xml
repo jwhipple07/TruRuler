@@ -31,9 +31,9 @@
     <string name="nav_title_calibrate">Calibrate</string>
     <string name="nav_title_new_measure">View Saved Measurements</string>
     <string name="nav_title_gallery">Gallery</string>
-    <string name="nav_title_slideshow">Slideshow</string>
-    <string name="nav_title_communicate">Communicate</string>
-    <string name="nav_title_share">Share</string>
+    <string name="nav_title_edit_photo">Edit a Photo</string>
+    <string name="nav_title_tools">Tools</string>
+    <string name="nav_title_take_photo">Take a Photo</string>
     <string name="nav_title_send">Send</string>
 
 

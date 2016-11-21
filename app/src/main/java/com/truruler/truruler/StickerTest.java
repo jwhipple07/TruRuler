@@ -14,7 +14,7 @@ import Sticker.StickerImageView;
 import Sticker.StickerTextView;
 import Sticker.StickerView;
 
-public class test extends AppCompatActivity {
+public class StickerTest extends AppCompatActivity {
     StickerImageView iv_sticker;
     StickerTextView tv_sticker;
     Button addNew;
@@ -30,13 +30,13 @@ public class test extends AppCompatActivity {
 
 
 //// add a stickerImage to canvas
-//        iv_sticker = new StickerImageView(test.this);
+//        iv_sticker = new StickerImageView(StickerTest.this);
 //        iv_sticker.setImageDrawable(getResources().getDrawable(R.drawable.arrow));
 
         addNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iv_sticker = new StickerImageView(test.this);
+                iv_sticker = new StickerImageView(StickerTest.this);
                 iv_sticker.setImageDrawable(getResources().getDrawable(R.drawable.arrow));
                 allStickerViews.add(iv_sticker);
                 canvas.addView(iv_sticker);
