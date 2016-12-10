@@ -30,8 +30,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import CustomViews.DrawView;
-import CustomViews.draggableMeasureView;
+import customviews.DrawView;
+import customviews.DraggableMeasureView;
 import measurements.MeasurementsDetailActivity;
 import measurements.MeasurementsOverviewActivity;
 
@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private android.widget.FrameLayout layout;
-    private draggableMeasureView draggable;
-    private draggableMeasureView draggableVertical;
+    private DraggableMeasureView draggable;
+    private DraggableMeasureView draggableVertical;
     private android.support.design.widget.FloatingActionButton floatButton;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
 
@@ -54,14 +54,17 @@ public class MainActivity extends AppCompatActivity
         layout = (android.widget.FrameLayout)findViewById(R.id.mainLayout);
 
         //The horizontal drag measurer
-        draggable = (draggableMeasureView) findViewById(R.id.DragView);
-        draggable.setOnTouchListener(new horizontalDragViewListener());
+        draggable = (DraggableMeasureView) findViewById(R.id.DragView);
+        DragViewListener listener = new DragViewListener();
+        draggable.setOnTouchListener(listener);
         draggable.bringToFront();
 
         //The vertical drag measurer
-        draggableVertical = (draggableMeasureView) findViewById(R.id.DragViewVertical);
+        draggableVertical = (DraggableMeasureView) findViewById(R.id.DragViewVertical);
         draggableVertical.verticalFlag = true;
-        draggableVertical.setOnTouchListener(new verticalDragViewListener());
+        listener = new DragViewListener();
+        listener.setVertical(true);
+        draggableVertical.setOnTouchListener(listener);
 
         //custom toolbar for the drawer theme
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -74,8 +77,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getBaseContext(), MeasurementsDetailActivity.class);
-                i.putExtra("width", draggable.currentLocation);
-                i.putExtra("height", draggableVertical.currentLocation);
+                i.putExtra("width", draggable.getCurrentLocation());
+                i.putExtra("height", draggableVertical.getCurrentLocation());
                 startActivity(i);
             }
         });
@@ -178,19 +181,8 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         } else if (id == R.id.nav_take_photo) {
             Intent imageIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
 
-            //folder stuff
-            File imagesFolder = new File(Environment.getExternalStorageDirectory(), "MyImages");
-            if(imagesFolder.mkdirs()){
-                Log.i("","Folder created");
-            }
-
-            File image = new File(imagesFolder, "QR_" + timeStamp + ".png");
-            Uri uriSavedImage = FileProvider.getUriForFile(MainActivity.this,
-                    BuildConfig.APPLICATION_ID + ".provider",
-                    image);
-
+            Uri uriSavedImage = getImageFileUri();
             imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriSavedImage);
             startActivityForResult(imageIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         }
@@ -204,46 +196,64 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    /**
-     * This listener is for the horizontal drag view
-     */
-    private final class horizontalDragViewListener implements View.OnTouchListener {
-        int orgX, orgY;
-        int offsetX, offsetY;
-        int orgYView;
-        int orgWidth, orgHeight;
+    private Uri getImageFileUri() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
 
+        //folder stuff
+        File imagesFolder = new File(Environment.getExternalStorageDirectory(), "MyImages");
+        if(imagesFolder.mkdirs()){
+            Log.i("","Folder created");
+        }
+
+        File image = new File(imagesFolder, "QR_" + timeStamp + ".png");
+        return FileProvider.getUriForFile(MainActivity.this,
+                BuildConfig.APPLICATION_ID + ".provider",
+                image);
+    }
+
+    /**
+     * This listener is for the drag views, set the flag for vertical.
+     */
+    private final class DragViewListener implements View.OnTouchListener {
+        private int orgX, orgY;
+        private int offsetX, offsetY;
+        private int orgXView, orgYView;
+        private android.widget.FrameLayout.LayoutParams layoutParams;
+        private boolean vertical;
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            draggableMeasureView draggable = (draggableMeasureView) v;
+            DraggableMeasureView draggable = (DraggableMeasureView) v;
             v.bringToFront();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     orgX = (int) event.getRawX();
                     orgY = (int) event.getRawY();
 
-                    orgWidth = v.getMeasuredWidth();
-                    orgHeight = v.getMeasuredHeight();
-
+                    orgXView = (int)v.getX();
                     orgYView = (int)v.getY();
 
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    offsetX = (int)event.getRawX() - orgX;
-                    offsetY = (int)event.getRawY() - orgY;
-                    android.widget.FrameLayout.LayoutParams layoutParams = (android.widget.FrameLayout.LayoutParams) v
-                            .getLayoutParams();
-                    Integer finalPlace = orgYView + offsetY;
-                    if(finalPlace < 0){
+                    offsetX = (int) event.getRawX() - orgX;
+                    offsetY = (int) event.getRawY() - orgY;
+                    layoutParams = (android.widget.FrameLayout.LayoutParams) v.getLayoutParams();
+                    Integer finalPlace = isVertical() ? orgXView + offsetX : orgYView + offsetY;
+                    if (finalPlace < 0) {
                         finalPlace = 0;
+                    } else if (finalPlace > dm.widthPixels - 100 && isVertical()) {
+                        finalPlace = dm.widthPixels - 100;
                     } else if(finalPlace > dm.heightPixels - 100){
                         finalPlace = dm.heightPixels - 100;
                     }
-                    layoutParams.topMargin = finalPlace;
-                    draggable.setConversion(finalPlace);
+                    if(isVertical()){
+                        layoutParams.leftMargin = finalPlace;
+                    } else {
+                        layoutParams.topMargin = finalPlace;
+                    }
                     v.setLayoutParams(layoutParams);
+                    draggable.setConversion(finalPlace);
                     break;
                 case MotionEvent.ACTION_UP:
                     break;
@@ -251,52 +261,13 @@ public class MainActivity extends AppCompatActivity
             layout.invalidate();
             return true;
         }
-    }
 
-    /**
-     * This listener is for the vertical drag view
-     */
-    private final class verticalDragViewListener implements View.OnTouchListener {
-        int orgX, orgY;
-        int offsetX, offsetY;
-        int orgXView;
-        int orgWidth, orgHeight;
+        public boolean isVertical() {
+            return vertical;
+        }
 
-        DisplayMetrics dm = getResources().getDisplayMetrics();
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            draggableMeasureView draggable = (draggableMeasureView) v;
-            v.bringToFront();
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    orgX = (int) event.getRawX();
-                    orgY = (int) event.getRawY();
-                    orgWidth = v.getMeasuredWidth();
-                    orgHeight = v.getMeasuredHeight();
-
-                    orgXView = (int)v.getX();
-
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    offsetX = (int) event.getRawX() - orgX;
-                    offsetY = (int) event.getRawY() - orgY;
-                    android.widget.FrameLayout.LayoutParams layoutParams = (android.widget.FrameLayout.LayoutParams) v
-                            .getLayoutParams();
-                    Integer finalPlace = orgXView + offsetX;
-                    if (finalPlace < 0) {
-                        finalPlace = 0;
-                    } else if (finalPlace > dm.widthPixels - 100) {
-                        finalPlace = dm.widthPixels - 100;
-                    }
-                    layoutParams.leftMargin = finalPlace;
-                    v.setLayoutParams(layoutParams);
-                    draggable.setConversion(finalPlace);
-                    break;
-                case MotionEvent.ACTION_UP:
-                    break;
-            }
-            layout.invalidate();
-            return true;
+        public void setVertical(boolean verticalFlag) {
+            this.vertical = verticalFlag;
         }
     }
 

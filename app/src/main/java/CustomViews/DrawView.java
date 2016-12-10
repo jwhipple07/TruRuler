@@ -1,4 +1,4 @@
-package CustomViews;
+package customviews;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,20 +21,15 @@ import junit.framework.Assert;
 
 import java.util.Locale;
 
-
-/**
- *
- * Created by JW043373 on 9/19/2016.
- */
 public class DrawView extends ImageView {
     private SharedPreferences sharedPreferences;
     private DisplayMetrics dm;
-    private Integer type;
+    private Integer type, myMinWidth, myMinHeight;;
     private Paint paint, paintText;
     private float[] points;
-    private Integer myMinWidth, myMinHeight;
     private final Rect textBounds = new Rect(); //don't new this up in a draw method
-    PointF mPoint1, mPoint2;
+    private PointF mPoint1, mPoint2;
+
     public DrawView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -44,16 +39,22 @@ public class DrawView extends ImageView {
 
     public void init(){
         dm = getResources().getDisplayMetrics();
-        paint = new Paint();
-        paintText = new Paint();
+        paint = new Paint();    //This will paint the lines and background of ruler
+        paintText = new Paint();    //This will paint the text that will show on the ruler
 
-        points = new float[64];
+        points = new float[64];     //initiate the points array to store the paths of what to draw
         myMinWidth = dm.widthPixels;
-        myMinHeight = dm.heightPixels*2;
+        myMinHeight = dm.heightPixels;
         mPoint1 = new PointF(dm.widthPixels/2, dm.heightPixels - 100); //starts at canvas left top
         mPoint2 = new PointF(dm.widthPixels - (dm.widthPixels/4), dm.heightPixels - 200);//end of line
     }
 
+    /**
+     * This will make the view's default size the full screen size
+     *
+     * @param widthMeasureSpec - width measurement spec
+     * @param heightMeasureSpec - height measurement spec
+     */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -72,11 +73,13 @@ public class DrawView extends ImageView {
         paintText.setColor(Color.BLUE);
 
         paint.setStrokeWidth(5);
+
         // Make the canvas white
         canvas.drawColor(Color.WHITE);
 
-        // Make the brush blue
+        // Make the brush black
         paint.setColor(Color.BLACK);
+
         if(AssertSettings.PRIORITY1_ASSERTIONS){
             //make sure that the type is set to 0 or 1
             Assert.assertTrue(this.type == 0 || this.type == 1);
@@ -95,7 +98,7 @@ public class DrawView extends ImageView {
         //draw instructions
         AssetManager am = getContext().getApplicationContext().getAssets();
 
-        Typeface typeface = Typeface.createFromAsset(am, String.format(Locale.US, "fonts/%s", "ExpletiveDeleted.ttf"));
+        Typeface typeface = Typeface.createFromAsset(am, String.format(Locale.US, "fonts/%s", "ExpletiveDeleted.ttf")); //set custom font for instructions
         paint.setTypeface(typeface);
         paint.setTextAlign(Paint.Align.RIGHT);
         paint.setTextSize(70);
@@ -103,7 +106,7 @@ public class DrawView extends ImageView {
         paint.setTextSize(70);
         canvas.drawText("Long click to show/hide menu", ( dm.widthPixels - 45), (dm.heightPixels/2 ) , paint);
 
-
+        //Draw the arrow to point to the floating button
         Path drawPath1 = drawCurve(mPoint1, mPoint2);
         paint.setStyle(Paint.Style.STROKE);
         canvas.drawPath(drawPath1, paint);
@@ -111,6 +114,13 @@ public class DrawView extends ImageView {
 
 
     }
+
+    /**
+     * To draw a curve, mPointa will be the starting point and mPointb will be the ending point.
+     * @param mPointa   - starting point
+     * @param mPointb   - ending point
+     * @return  -the path to draw
+     */
     private Path drawCurve(PointF mPointa, PointF mPointb) {
         Path myPath = new Path();
         myPath.moveTo(mPointa.x, mPointa.y);
@@ -120,94 +130,102 @@ public class DrawView extends ImageView {
         return myPath;
     }
 
+    /**
+     * This will draw the CM lines of the ruler. For every CM it will loop through and draw each MM line.
+     *
+     * @param topBar    - flag to draw the ruler on the top or the side
+     * @param DPI   - dot per inch for this current drawing
+     * @param canvas    - the canvas to draw on
+     */
     public void drawCM(boolean topBar, float DPI, Canvas canvas) {
-        float distancePixelMark = dm.widthPixels / 5F;
+        float distancePixelMark = dm.widthPixels / 5F; //the max size of the line to draw is 1/5 of screen
         int val1, val2;
-        if(topBar){
-            val1 = 2;
-            val2 = 3;
-        } else {
-            val1 =3;
-            val2 = 2;
-        }
-        for (int i = 0; i < 20; i++) {
-            for (int j = 0; j < 40; j += 4) {
-                if(topBar){
-                    points[j] = (i * DPI) + ((j / 4) * (DPI / 10));
-                    points[j + 1] = 0;
-                } else {
-                    points[j] = 0;
-                    points[j + 1] = (i * DPI) + ((j / 4) * (DPI / 10));
-                }
+
+        //val1 and val2 are used as the index for the path's array
+        val1 = topBar ? 2 : 3;
+        val2 = topBar ? 3 : 2;
+
+        for (int i = 0; i < 20; i++) { //this will draw up to 20 CM
+            for (int j = 0; j < 40; j += 4) {//starting a new path to draw
+                //the start of the path
+                points[j] = topBar ? (i * DPI) + ((j / 4) * (DPI / 10)) : 0;
+                points[j + 1] = topBar ? 0 : (i * DPI) + ((j / 4) * (DPI / 10));
+
+                //these will be the ending points of the path
                 points[j + val1] = (i * DPI) + ((j / 4) * (DPI / 10));
                 switch (j / 4) {
                     case 0:
-                        points[j + val2] = distancePixelMark / 1.33F;
+                        points[j + val2] = distancePixelMark / 1.33F; //CM line
                         break;
                     case 5:
-                        points[j + val2] = distancePixelMark / 2F;
+                        points[j + val2] = distancePixelMark / 2F;  // 1/2 CM line
                         break;
                     default:
-                        points[j + val2] = distancePixelMark / 4F;
+                        points[j + val2] = distancePixelMark / 4F;  // MM line
                         break;
                 }
             }
-            if (i != 0) {
+            if (i != 0) { //draw the number only on the main CM line
                 if(topBar) {
                     drawTextCentered(canvas, paintText, Integer.toString(i), points[2], points[3] + 25);
                 } else {
                     drawTextCentered(canvas, paintText, Integer.toString(i), points[2]+25, points[3]);
                 }
             }
-            canvas.drawLines(points, paint);
+            canvas.drawLines(points, paint);    //from the paths generated, draw all the lines
         }
     }
     public void drawInch(boolean topBar, float DPI, Canvas canvas ){
-        float distancePixelMark = dm.widthPixels / 5F;
+        float distancePixelMark = dm.widthPixels / 5F; //the max size of the line to draw is 1/5 of screen
         int val1, val2;
-        if(topBar){
-            val1 = 2;
-            val2 = 3;
-        } else {
-            val1 =3;
-            val2 = 2;
-        }
-        for (int j = 0; j < 5; j++) {
-            for (int i = 0; i < 64; i += 4) {
-                if(topBar) {
-                    points[i] = (j * DPI) + ((i / 4) * (DPI / 16));
-                    points[i + 1] = 0;
-                } else {
-                    points[i + 1] = (j * DPI) + ((i / 4) * (DPI / 16));
-                    points[i] = 0;
-                }
+
+        //val1 and val2 are used as the index for the path's array
+        val1 = topBar ? 2 : 3;
+        val2 = topBar ? 3 : 2;
+
+        for (int j = 0; j < 5; j++) { //This will draw up to 5 inches
+            for (int i = 0; i < 64; i += 4) { //Start a new path to draw
+
+                //the starting point of the path
+                points[i] = topBar ? (j * DPI) + ((i / 4) * (DPI / 16)) : 0;
+                points[i + 1] = topBar ? 0 : (j * DPI) + ((i / 4) * (DPI / 16));
+
+                //the ending point of the path
                 points[i + val1] = (j * DPI) + ((i / 4) * (DPI / 16));
                 switch (i / 4) {
                     case 0:
-                        points[i + val2] = distancePixelMark;
+                        points[i + val2] = distancePixelMark;   //INCH line
                         break;
                     case 4:
                     case 12:
-                        points[i + val2] = distancePixelMark / 2.6F;
+                        points[i + val2] = distancePixelMark / 2.6F;    //  1/4 and 3/4 INCH line
                         break;
                     case 8:
-                        points[i + val2] = distancePixelMark / 1.6F;
+                        points[i + val2] = distancePixelMark / 1.6F;    //  1/2 INCH line
                         break;
                     default:
-                        points[i + val2] = distancePixelMark / 8;
+                        points[i + val2] = distancePixelMark / 8;   // All other 1/8 INCH lines
                 }
             }
             if (j != 0) {
-                if(topBar) {
+                if(topBar) { //draw the number only on the main INCH line
                     drawTextCentered(canvas, paintText, Integer.toString(j), points[2], points[3] + 25);
                 } else {
                     drawTextCentered(canvas, paintText, Integer.toString(j), points[2]+25, points[3]);
                 }
             }
-            canvas.drawLines(points, paint);
+            canvas.drawLines(points, paint);    //from the paths generated, draw all the lines
         }
     }
 
+    /**
+     * Draw text centered horizontally and vertically at a specified point
+     * @param canvas - canvas to draw on
+     * @param paint - the paint to use
+     * @param text - the text to draw
+     * @param cx - X-point of position
+     * @param cy - Y-point of the position
+     */
     public void drawTextCentered(Canvas canvas, Paint paint, String text, float cx, float cy){
         paint.getTextBounds(text, 0, text.length(), textBounds);
         canvas.drawText(text, cx - textBounds.exactCenterX(), cy - textBounds.exactCenterY(), paint);

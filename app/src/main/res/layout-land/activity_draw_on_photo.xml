@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/DrawOnFrameLayout"
+    >
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose Picture"
+        android:id="@+id/ChoosePictureButton"/>
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:id="@+id/photo_draw_layout">-->
+
+        <ImageView android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/ChoosenImageView"
+            android:layout_gravity="center">
+        </ImageView>
+
+    <!--</LinearLayout>-->
+
+    <Button
+        android:text="Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:id="@+id/AddNewLengthButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:text="Save Picture"
+        android:id="@+id/SavePictureButton"
+        android:elevation="17dp" />
+</FrameLayout>

@@ -1,4 +1,4 @@
-package photoViewer;
+package photoviewer;
 
 import android.content.Context;
 import android.net.Uri;

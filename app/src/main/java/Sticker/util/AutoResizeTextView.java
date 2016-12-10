@@ -1,4 +1,4 @@
-package Sticker.util;
+package sticker.util;
 
 import android.annotation.TargetApi;
 import android.content.Context;

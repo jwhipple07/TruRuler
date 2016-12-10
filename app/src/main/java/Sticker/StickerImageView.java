@@ -1,4 +1,4 @@
-package Sticker;
+package sticker;
 
 
 import android.content.Context;

@@ -10,9 +10,9 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import Sticker.StickerImageView;
-import Sticker.StickerTextView;
-import Sticker.StickerView;
+import sticker.StickerImageView;
+import sticker.StickerTextView;
+import sticker.StickerView;
 
 public class StickerTest extends AppCompatActivity {
     StickerImageView iv_sticker;

@@ -41,21 +41,23 @@
             android:name="contentprovider.MeasurementsContentProvider"
             android:authorities="contentprovider" />
         <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
+        android:name="android.support.v4.content.FileProvider"
+        android:authorities="${applicationId}.provider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/provider_paths" />
+    </provider>
 
-        <activity android:name=".DrawOnPhotoActivity" />
+        <activity android:name=".DrawOnPhotoActivity"
+            android:screenOrientation="landscape"/>
+
         <activity
             android:name=".PhotoGridActivity"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name="photoViewer.DetailActivity"
+            android:name="photoviewer.DetailActivity"
             android:theme="@style/AppTheme2" />
         <activity android:name=".StickerTest"></activity>
     </application>

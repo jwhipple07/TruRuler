@@ -28,7 +28,7 @@ import contentprovider.MeasurementsContentProvider;
 public class MeasurementsDetailActivity extends AppCompatActivity {
     private Spinner mType;
     private EditText mBodyText;
-    private EditText mwidth;
+    private EditText mWidth;
     private EditText mHeight;
     private DatePicker mdate;
 
@@ -41,7 +41,7 @@ public class MeasurementsDetailActivity extends AppCompatActivity {
         setContentView(R.layout.measure_edit);
         mType = (Spinner) findViewById(R.id.measure_type);
         mBodyText = (EditText) findViewById(R.id.measure_edit_summary);
-        mwidth = (EditText) findViewById(R.id.measure_edit_width);
+        mWidth = (EditText) findViewById(R.id.measure_edit_width);
         mHeight = (EditText) findViewById(R.id.measure_edit_height);
         mdate = (DatePicker) findViewById(R.id.measure_datePicker);
         Bundle extras = getIntent().getExtras();
@@ -63,7 +63,7 @@ public class MeasurementsDetailActivity extends AppCompatActivity {
     }
 
     public void fillExtra(Float width, Float height) {
-        mwidth.setText(String.format(Locale.getDefault(), "%.1f", width));
+        mWidth.setText(String.format(Locale.getDefault(), "%.1f", width));
         mHeight.setText(String.format(Locale.getDefault(), "%.1f", height));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         int type = Integer.parseInt(sharedPreferences.getString("example_list", "0"));
@@ -83,7 +83,7 @@ public class MeasurementsDetailActivity extends AppCompatActivity {
             case R.id.save_measurement:
                 String type = (String) mType.getSelectedItem();
                 String description = mBodyText.getText().toString();
-                String width = mwidth.getText().toString();
+                String width = mWidth.getText().toString();
                 String height = mHeight.getText().toString();
 
                 // only save if either summary or description is available
@@ -115,7 +115,7 @@ public class MeasurementsDetailActivity extends AppCompatActivity {
                 }
             }
 
-            mwidth.setText(cursor.getString(cursor.getColumnIndexOrThrow(MeasurementsTable.COLUMN_WIDTH)));
+            mWidth.setText(cursor.getString(cursor.getColumnIndexOrThrow(MeasurementsTable.COLUMN_WIDTH)));
             mHeight.setText(cursor.getString(cursor.getColumnIndexOrThrow(MeasurementsTable.COLUMN_HEIGHT)));
             mBodyText.setText(cursor.getString(cursor.getColumnIndexOrThrow(MeasurementsTable.COLUMN_DESCRIPTION)));
             String[] date = cursor.getString(cursor.getColumnIndexOrThrow(MeasurementsTable.COLUMN_LAST_UPDTTM)).split("/");
@@ -141,7 +141,7 @@ public class MeasurementsDetailActivity extends AppCompatActivity {
     private void saveState() {
         String type = (String) mType.getSelectedItem();
         String description = mBodyText.getText().toString();
-        String width = mwidth.getText().toString();
+        String width = mWidth.getText().toString();
         String height = mHeight.getText().toString();
         Integer day = mdate.getDayOfMonth();
         Integer month = mdate.getMonth();

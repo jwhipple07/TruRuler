@@ -1,4 +1,4 @@
-package photoViewer;
+package photoviewer;
 
 import android.support.v4.view.ViewPager;
 import android.view.View;

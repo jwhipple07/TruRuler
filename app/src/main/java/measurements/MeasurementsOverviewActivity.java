@@ -33,6 +33,7 @@ import contentprovider.MeasurementsContentProvider;
 
 public class MeasurementsOverviewActivity extends ListActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
+
     private static final int DELETE_ID = Menu.FIRST + 1;
     private SimpleCursorAdapter adapter;
 
@@ -71,6 +72,7 @@ public class MeasurementsOverviewActivity extends ListActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    //if delete option is selected in pop up menu item then delete the item.
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -118,6 +120,7 @@ public class MeasurementsOverviewActivity extends ListActivity implements
         setListAdapter(adapter);
     }
 
+    //create a pop up menu to delete
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);

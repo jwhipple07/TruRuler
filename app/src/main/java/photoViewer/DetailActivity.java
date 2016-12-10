@@ -1,4 +1,4 @@
-package photoViewer;
+package photoviewer;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -93,7 +93,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_detail, menu);
+        getMenuInflater().inflate(R.menu.delete, menu);
         return true;
     }
 
@@ -106,7 +106,16 @@ public class DetailActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            File fdelete = new File(data.get(pos).getUrl());
+            if (fdelete.exists()) {
+                if (fdelete.delete()) {
+                    System.out.println("file Deleted :" + data.get(pos).getUrl());
+                } else {
+                    System.out.println("file not Deleted :" + data.get(pos).getUrl());
+                }
+            }
+            finish();
+            startActivity(getIntent());
         }
 
         return super.onOptionsItemSelected(item);

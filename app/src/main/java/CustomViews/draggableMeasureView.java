@@ -1,4 +1,4 @@
-package CustomViews;
+package customviews;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,17 +17,25 @@ import com.truruler.truruler.R;
 
 import java.util.Locale;
 
-public class draggableMeasureView extends View {
+public class DraggableMeasureView extends View {
     private DisplayMetrics dm;
     private Paint paint;
     private Paint paintText;
     private Integer myMinWidth, myMinHeight;
-    public Float currentLocation = 0F;
+    private Float currentLocation = 0F;
     private SharedPreferences sharedPreferences;
+
+    public Float getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(Float currentLocation) {
+        this.currentLocation = currentLocation;
+    }
 
     public boolean verticalFlag = false;
 
-    public draggableMeasureView(Context context, AttributeSet attrs) {
+    public DraggableMeasureView(Context context, AttributeSet attrs) {
         super(context, attrs);
         if (isInEditMode()) return;
         init();
@@ -70,7 +78,7 @@ public class draggableMeasureView extends View {
             paintText.setColor(Color.LTGRAY);
             paintText.setTextSize(50);
             paintText.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText(String.format(Locale.ENGLISH, "%.1f", currentLocation), 50, dm.heightPixels-25, paintText);
+            canvas.drawText(String.format(Locale.ENGLISH, "%.1f", getCurrentLocation()), 50, dm.heightPixels-25, paintText);
 
         } else {
             canvas.drawLine(0, 50, myMinWidth, 50, paint);
@@ -80,7 +88,7 @@ public class draggableMeasureView extends View {
             paintText.setTextAlign(Paint.Align.CENTER);
             canvas.save();
             canvas.rotate(90);
-            canvas.drawText(String.format(Locale.ENGLISH, "%.1f", currentLocation), 50,-dm.widthPixels+50, paintText);
+            canvas.drawText(String.format(Locale.ENGLISH, "%.1f", getCurrentLocation()), 50,-dm.widthPixels+50, paintText);
             canvas.restore();
         }
     }
@@ -96,10 +104,10 @@ public class draggableMeasureView extends View {
 
         switch(type){
             case 0: //metric
-                this.currentLocation = (pixels+ 55)/(deviceActualDpi/2.5F) ;
+                this.setCurrentLocation((pixels+ 55)/(deviceActualDpi/2.5F));
                 break;
             case 1:
-                this.currentLocation = ((pixels+ 55)/deviceActualDpi) ;
+                this.setCurrentLocation(((pixels+ 55)/deviceActualDpi));
                 break;
 
         }
